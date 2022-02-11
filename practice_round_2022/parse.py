@@ -6,11 +6,12 @@ class Customer:
     self.like = set(like)
     self.dislike = set(dislike)
     self.idx = idx
-    self.neighbour = []
+    self.neighbour = set()
+    self.cnt = len(like) + len(dislike)
 
   def add_compat(self, cus):
     if self.like & cus.dislike == set() and self.dislike & cus.like == set():
-      self.neighbour.append(cus)
+      self.neighbour.add(cus)
 
   def __str__(self):
     return "{} {}".format(self.like, self.dislike)
