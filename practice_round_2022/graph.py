@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-from parse import parse, format_ans, check
 import sys
+import random
+from parse import parse, format_ans, check
 
 sys.setrecursionlimit(1000000)
 
@@ -81,10 +82,23 @@ def clique_compat(cus, clique):
 
 def maximal_clique(start, ll):
   clique = [start]
+  #best_clique = []
+  #best_score = 0
+  #while True:
   for l in ll:
     if clique_compat(l.val, clique) is True:
       clique.append(l.val) 
       ll.remove()
+    elif len(clique) == 1:
+        ll.remove()
+    #if len(clique) > best_score:
+    #  best_clique = clique[::]
+    #  best_score = len(clique)
+
+    #if len(clique) > 1:
+    #  clique.pop()
+    #else:
+    #  break
   return clique
       
 
@@ -95,7 +109,7 @@ if __name__ == "__main__":
   fn4 = "d_difficult.in.txt"
   fn5 = "e_elaborate.in.txt"
 
-  fn = fn5
+  fn = fn4
 
   path = "input_data/{}".format(fn)
 
@@ -109,22 +123,31 @@ if __name__ == "__main__":
         c.add_compat(j)
   print("build complete")
 
-  start = customers[2]
-  # Remove the starting elements
-  customers.pop(2)
-  ll = LinkedList(customers)
-  result = maximal_clique(start, ll)
-  print(len(result), result)
+  for i in range(10):
+    random.shuffle(customers)
+    i = random.randrange(len(customers))
+    start = customers[i]
+    # Remove the starting elements
+    customers.pop(i)
+    ll = LinkedList(customers)
+    result = maximal_clique(start, ll)
 
-  piz = set()
-  for r in result:
-    piz = piz | r.like
+    piz = set()
+    for r in result:
+      piz = piz | r.like
 
-  fa = format_ans(piz)
-  score = check(piz, customers) 
-  print("{}/{}".format(score, len(customers)))
-  with open("output_data/{}_{}".format(score, fn), "w") as f:
-    f.write(fa)
+    fa = format_ans(piz)
+
+    # Very scuff
+    customers.append(start)
+    # Very scuff
+
+    #score = check(piz, customers) 
+    score = len(result)
+    print("Start: %d" % i)
+    print("{}/{}".format(score, len(customers)))
+    with open("output_data/{}_{}".format(score, fn), "w") as f:
+      f.write(fa)
 
 
   #for c in customers:
