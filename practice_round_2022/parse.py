@@ -9,9 +9,11 @@ class Customer:
     self.neighbour = set()
     self.cnt = len(like) + len(dislike)
 
-  def add_compat(self, cus):
-    if self.like & cus.dislike == set() and self.dislike & cus.like == set():
-      self.neighbour.add(cus)
+  def compat(self, cus):
+    return self.like & cus.dislike == set() and self.dislike & cus.like == set()
+
+  def anticompat(self, cus):
+    return self.like & cus.dislike != set() or self.dislike & cus.like != set()
 
   def __str__(self):
     return "{} {}".format(self.like, self.dislike)

@@ -24,7 +24,8 @@ def compat(ing, c):
   if ing & c.dislike == set():
     return True
   return False
-    
+
+
 class Node:
   def __init__(self, val=None, prev=None, nxt=None):
     self.val = val
@@ -74,31 +75,40 @@ class LinkedList:
     prev.nxt = self.curr 
     self.curr.prev = prev
 
+  def add(self, node):
+    # Take the last node
+    last = self.end.prev
+
+    # New last node is attach
+    last.nxt = node
+    # Attach last node to new last node
+    node.prev = last
+    # Attach end to the new node
+    node.nxt = self.end
+    # Attach new node to end node
+    self.end.prev = node
+
+
 def clique_compat(cus, clique):
   for c in clique:
     if c not in cus.neighbour:
       return False
   return True
 
-def maximal_clique(start, ll):
+def independent_compat(cus, ind):
+  for c in ind:
+    if c in cus.neighbour:
+      return False
+  return True
+
+def find_group(start, ll, f):
   clique = [start]
-  #best_clique = []
-  #best_score = 0
-  #while True:
   for l in ll:
-    if clique_compat(l.val, clique) is True:
+    if f(l.val, clique) is True:
       clique.append(l.val) 
       ll.remove()
     elif len(clique) == 1:
         ll.remove()
-    #if len(clique) > best_score:
-    #  best_clique = clique[::]
-    #  best_score = len(clique)
-
-    #if len(clique) > 1:
-    #  clique.pop()
-    #else:
-    #  break
   return clique
       
 
@@ -109,7 +119,7 @@ if __name__ == "__main__":
   fn4 = "d_difficult.in.txt"
   fn5 = "e_elaborate.in.txt"
 
-  fn = fn4
+  fn = fn5
 
   path = "input_data/{}".format(fn)
 
@@ -120,43 +130,31 @@ if __name__ == "__main__":
   for c in customers:
     for j in customers:
       if c != j:
-        c.add_compat(j)
+        if c.anticompat(j):
+          c.neighbour.add(j)
   print("build complete")
 
-  for i in range(10):
-    random.shuffle(customers)
-    i = random.randrange(len(customers))
-    start = customers[i]
-    # Remove the starting elements
-    customers.pop(i)
-    ll = LinkedList(customers)
-    result = maximal_clique(start, ll)
-
-    piz = set()
-    for r in result:
-      piz = piz | r.like
-
-    fa = format_ans(piz)
-
-    # Very scuff
-    customers.append(start)
-    # Very scuff
-
-    #score = check(piz, customers) 
-    score = len(result)
-    print("Start: %d" % i)
-    print("{}/{}".format(score, len(customers)))
-    with open("output_data/{}_{}".format(score, fn), "w") as f:
-      f.write(fa)
+  customers = sorted(customers, key=lambda x: len(x.neighbour))
+  start = customers[0]
+  # Remove the starting elements
+  customers.pop(0)
+  ll = LinkedList(customers)
+  result = find_group(start, ll, independent_compat)
+  # Very scuff
+  customers.append(start)
+  # Very scuff
 
 
-  #for c in customers:
-  #  print(len(c.neighbour), c, c.neighbour)
-  #print()
-  #print("start")
-  #print(maximal_clique({customers[0]}))
-  #dfs(customers[4225], set(), set(), 1)
+  piz = set()
+  for r in result:
+    piz = piz | r.like
 
-  #print(len(b[1]))
-  #print(fa)
+  fa = format_ans(piz)
+
+
+  #score = check(piz, customers) 
+  score = len(result)
+  print("{}/{}".format(score, len(customers)))
+  with open("output_data/{}_{}".format(score, fn), "w") as f:
+    f.write(fa)
 
